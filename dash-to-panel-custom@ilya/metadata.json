@@ -1,0 +1,8 @@
+{
+  "description": "Полная кастомизация панели GNOME: позиционирование, стилизация, управление виджетами",
+  "name": "Custom Panel",
+  "shell-version": ["43"],
+  "uuid": "dash-to-panel-custom@ilya",
+  "version": 2,
+  "settings-schema": "org.gnome.shell.extensions.panel-margins"
+}
