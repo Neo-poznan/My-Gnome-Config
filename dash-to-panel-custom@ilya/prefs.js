@@ -169,6 +169,15 @@ function createAppearancePage(settings) {
         16, 64
     ));
 
+    // Размер шрифта системного монитора
+    page.append(createSpinRow(
+        settings,
+        'Размер шрифта монитора',
+        'Размер шрифта виджета системного монитора',
+        'sysmon-font-size',
+        8, 18
+    ));
+    
     // Отступ слева
     page.append(createSpinRow(
         settings,
@@ -237,6 +246,8 @@ function createWidgetsPage(settings) {
         { posKey: 'clock-position', prioKey: 'clock-priority', title: 'Часы', subtitle: 'Дата и время' },
         { posKey: 'systemmenu-position', prioKey: 'systemmenu-priority', title: 'Системное меню', subtitle: 'Быстрые настройки, звук, сеть' },
         { posKey: 'keyboard-position', prioKey: 'keyboard-priority', title: 'Раскладка клавиатуры', subtitle: 'Индикатор раскладки' },
+        { posKey: 'sysmon-position', prioKey: 'sysmon-priority', title: 'Монитор системы', subtitle: 'Память, процессор, температура' },
+        { posKey: 'media-player-position', prioKey: 'media-player-priority', title: 'Медиа-плеер', subtitle: 'Отображает текущую музыку/видео' },
         { posKey: 'thirdparty-position', prioKey: 'thirdparty-priority', title: 'Сторонние виджеты', subtitle: 'Виджеты от других расширений' },
     ];
 
@@ -280,6 +291,8 @@ function createWidgetsPage(settings) {
         { key: 'hide-clock', title: 'Скрыть часы' },
         { key: 'hide-systemmenu', title: 'Скрыть системное меню' },
         { key: 'hide-keyboard', title: 'Скрыть раскладку клавиатуры' },
+        { key: 'hide-sysmon', title: 'Скрыть монитор системы' },
+        { key: 'hide-media-player', title: 'Скрыть медиа-плеер' },
         { key: 'hide-thirdparty', title: 'Скрыть сторонние виджеты' },
     ];
 

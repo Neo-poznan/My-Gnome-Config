@@ -34,10 +34,9 @@ var Taskbar = class Taskbar {
      */
     createWidgets(panel) {
         this._panel = panel;
-        this._settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.panel-margins');
         
         // Получаем размер иконок из настроек
-        this._iconSize = this._settings.get_int('icon-size');
+        this._iconSize = 30;
         
         // Создаем кнопку показа приложений
         this._showAppsButton = this._createShowAppsButton();
@@ -79,14 +78,7 @@ var Taskbar = class Taskbar {
         
         // Создаём popup для превью окон
         this._windowPreview = new WindowPreviewPopup();
-        
-        // Слушаем изменения в настройках
-        this._settingsChangedId = this._settings.connect('changed', (settings, key) => {
-            if (key === 'icon-size') {
-                this._iconSize = settings.get_int('icon-size');
-                this._updateIconSizes();
-            }
-        });
+    
     }
     
     /**
@@ -154,11 +146,6 @@ var Taskbar = class Taskbar {
         
         this._removeGlobalClickHandler();
         
-        if (this._settingsChangedId && this._settings) {
-            this._settings.disconnect(this._settingsChangedId);
-            this._settingsChangedId = null;
-        }
-        
         // Удаляем элементы из всех возможных контейнеров
         if (this._showAppsButton) {
             const parent = this._showAppsButton.get_parent();
@@ -175,14 +162,13 @@ var Taskbar = class Taskbar {
         }
         
         this._panel = null;
-        this._settings = null;
     }
     
     /**
      * Обновляет позиции элементов на панели
      */
     _updatePositions() {
-        if (!this._panel || !this._settings) return;
+        if (!this._panel ) return;
         
         // Удаляем из текущих родителей
         if (this._showAppsButton.get_parent()) {
@@ -190,32 +176,6 @@ var Taskbar = class Taskbar {
         }
         if (this._container.get_parent()) {
             this._container.get_parent().remove_child(this._container);
-        }
-        
-        // Добавляем кнопку приложений в нужную позицию (если не скрыта)
-        if (!this._settings.get_boolean('hide-showapps')) {
-            const showAppsPos = this._settings.get_string('showapps-position');
-            this._getBoxForPosition(showAppsPos).add_child(this._showAppsButton);
-        }
-        
-        // Добавляем таскбар в нужную позицию (если не скрыт)
-        if (!this._settings.get_boolean('hide-taskbar')) {
-            const taskbarPos = this._settings.get_string('taskbar-position');
-            this._getBoxForPosition(taskbarPos).add_child(this._container);
-        }
-    }
-    
-    /**
-     * Возвращает box для указанной позиции
-     */
-    _getBoxForPosition(position) {
-        switch (position) {
-            case 'center':
-                return this._panel.centerBox;
-            case 'right':
-                return this._panel.rightBox;
-            default:
-                return this._panel.leftBox;
         }
     }
     
@@ -325,7 +285,7 @@ var Taskbar = class Taskbar {
             if (button.hover) {
                 const windows = app.get_windows().filter(w => !w.skip_taskbar);
                 if (windows.length > 0 && this._windowPreview) {
-                    const panelPosition = this._settings.get_string('panel-position');
+                    const panelPosition = 'top';
                     this._windowPreview.showWithDelay(app, button, panelPosition);
                 }
             } else {
@@ -443,7 +403,7 @@ var Taskbar = class Taskbar {
         
         // Позиционируем меню относительно кнопки
         const [buttonX, buttonY] = button.get_transformed_position();
-        const panelPosition = this._settings.get_string('panel-position');
+        const panelPosition = 'top';
         
         if (panelPosition === 'bottom') {
             this._contextMenu.actor.set_position(

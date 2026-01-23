@@ -22,6 +22,7 @@ var SystemIndicators = class SystemIndicators {
     constructor() {
         this._panel = null;
         this._settings = null;
+        this._widgetPositioner = null;
         this._movedElements = [];
         this._settingsChangedId = null;
         this._statusAreaWatchId = null;
@@ -30,9 +31,11 @@ var SystemIndicators = class SystemIndicators {
     /**
      * Включает и переносит элементы на указанную панель
      * @param {Panel} panel - наша кастомная панель
+     * @param {WidgetPositioner} widgetPositioner - централизованный позиционер (опционально)
      */
-    enable(panel) {
+    enable(panel, widgetPositioner = null) {
         this._panel = panel;
+        this._widgetPositioner = widgetPositioner;
         this._settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.panel-margins');
         
         // Известные элементы с настройками позиции и приоритета
@@ -68,13 +71,6 @@ var SystemIndicators = class SystemIndicators {
         // Переносим все элементы из statusArea
         this._moveAllElements();
         
-        // Слушаем изменения в настройках
-        this._settingsChangedId = this._settings.connect('changed', (settings, key) => {
-            if (key.endsWith('-position') || key.startsWith('hide-') || key.endsWith('-priority')) {
-                this._updateAllElements();
-            }
-        });
-        
         // Следим за новыми элементами в statusArea (для сторонних расширений)
         this._watchStatusArea();
     }
@@ -94,6 +90,18 @@ var SystemIndicators = class SystemIndicators {
             this._statusAreaWatchId = null;
         }
         
+        // Если используем WidgetPositioner - отменяем регистрацию
+        if (this._widgetPositioner) {
+            this._movedElements.forEach(info => {
+                const config = this._knownElements[info.statusName];
+                if (config) {
+                    this._widgetPositioner.unregisterWidget(`system:${info.statusName}`);
+                } else {
+                    this._widgetPositioner.unregisterWidget(`thirdparty:${info.statusName}`);
+                }
+            });
+        }
+        
         // Возвращаем элементы на их оригинальные места
         this._movedElements.forEach(info => {
             this._restoreElement(info);
@@ -102,6 +110,7 @@ var SystemIndicators = class SystemIndicators {
         this._movedElements = [];
         this._panel = null;
         this._settings = null;
+        this._widgetPositioner = null;
     }
     
     /**
@@ -131,12 +140,70 @@ var SystemIndicators = class SystemIndicators {
     _moveAllElements() {
         const statusArea = Main.panel.statusArea;
         
-        // Пропускаем activities - он нам не нужен
-        const skipElements = ['activities'];
+        // Элементы, которые НЕ являются частью statusArea (обрабатываются отдельно)
+        const nonStatusAreaElements = [];
         
+        // Сначала переносим элементы из statusArea
         for (const name in statusArea) {
-            if (skipElements.includes(name)) continue;
             this._moveElement(name);
+        }
+        
+        // Теперь обрабатываем кнопку Activities отдельно (она не в statusArea)
+        this._moveActivitiesButton();
+    }
+    
+    /**
+     * Переносит кнопку Activities
+     */
+    _moveActivitiesButton() {
+        const activities = Main.panel.statusArea.activities;
+        
+        // Activities может быть в statusArea или как отдельный элемент
+        if (activities && activities.container) {
+            // Уже обработан через statusArea
+            return;
+        }
+        
+        // Пробуем найти activities button в _leftBox
+        const activitiesButton = Main.panel._leftBox.get_children().find(child => {
+            return child.name === 'panelActivities' || 
+                   child.get_style_class_name && child.get_style_class_name().includes('activities');
+        });
+        
+        if (activitiesButton) {
+            const originalParent = activitiesButton.get_parent();
+            const originalIndex = originalParent ? originalParent.get_children().indexOf(activitiesButton) : -1;
+            
+            const info = {
+                statusName: 'activities',
+                element: null,
+                container: activitiesButton,
+                originalParent: originalParent,
+                originalPosition: 'left',
+                originalIndex: originalIndex,
+                isThirdParty: false
+            };
+            
+            if (originalParent) {
+                originalParent.remove_child(activitiesButton);
+            }
+            
+            this._movedElements.push(info);
+            
+            if (this._widgetPositioner) {
+                const config = this._knownElements['activities'];
+                this._widgetPositioner.registerWidget(
+                    'system:activities',
+                    activitiesButton,
+                    config.settingsKey,
+                    config.priorityKey,
+                    config.hideKey
+                );
+            }
+            
+            log('[SystemIndicators] Moved activities button');
+        } else {
+            log('[SystemIndicators] Activities button not found');
         }
     }
     
@@ -185,37 +252,46 @@ var SystemIndicators = class SystemIndicators {
         // Удаляем из оригинального родителя
         originalParent.remove_child(container);
         
-        // Определяем позицию, видимость и приоритет
-        const config = this._knownElements[statusName];
-        let position = originalPosition;
-        let hidden = false;
-        let priority = 5; // Средний приоритет по умолчанию
-        
-        if (config) {
-            position = this._settings.get_string(config.settingsKey);
-            hidden = this._settings.get_boolean(config.hideKey);
-            priority = this._settings.get_int(config.priorityKey);
-        } else {
-            // Сторонний виджет - используем общие настройки
-            position = this._settings.get_string('thirdparty-position');
-            priority = this._settings.get_int('thirdparty-priority');
-            hidden = this._settings.get_boolean('hide-thirdparty');
-        }
-        
-        info.currentPosition = position;
-        info.hidden = hidden;
-        info.priority = priority;
-        
         this._movedElements.push(info);
         
-        // Добавляем все элементы с учётом приоритетов
-        this._rebuildAllPositions();
+        // Если есть централизованный позиционер - регистрируем в нём
+        if (this._widgetPositioner) {
+            const config = this._knownElements[statusName];
+            if (config) {
+                this._widgetPositioner.registerWidget(
+                    `system:${statusName}`,
+                    container,
+                    config.settingsKey,
+                    config.priorityKey,
+                    config.hideKey
+                );
+                log(`[SystemIndicators] Registered system widget: ${statusName}, container visible: ${container.visible}, width: ${container.width}, height: ${container.height}`);
+            } else {
+                // Сторонний виджет
+                this._widgetPositioner.registerWidget(
+                    `thirdparty:${statusName}`,
+                    container,
+                    'thirdparty-position',
+                    'thirdparty-priority',
+                    'hide-thirdparty'
+                );
+                log(`[SystemIndicators] Registered thirdparty widget: ${statusName}`);
+            }
+        } else {
+            // Старый режим - локальное позиционирование
+            this._rebuildAllPositions();
+        }
     }
     
     /**
      * Обновляет позиции и видимость всех элементов
      */
     _updateAllElements() {
+        // В режиме WidgetPositioner не нужно делать ничего - он сам отслеживает
+        if (this._widgetPositioner) {
+            return;
+        }
+        
         this._movedElements.forEach(info => {
             const config = this._knownElements[info.statusName];
             
@@ -244,9 +320,14 @@ var SystemIndicators = class SystemIndicators {
     }
     
     /**
-     * Перестраивает все элементы с учётом приоритетов
+     * Перестраивает все элементы с учётом приоритетов (только для старого режима без WidgetPositioner)
      */
     _rebuildAllPositions() {
+        // В режиме WidgetPositioner не нужно - он сам управляет
+        if (this._widgetPositioner) {
+            return;
+        }
+        
         // Удаляем все элементы из текущих родителей
         this._movedElements.forEach(info => {
             const currentParent = info.container.get_parent();
@@ -259,8 +340,27 @@ var SystemIndicators = class SystemIndicators {
         const byPosition = { left: [], center: [], right: [] };
         
         this._movedElements.forEach(info => {
-            if (!info.hidden) {
-                byPosition[info.currentPosition].push(info);
+            // Получаем текущие настройки для элемента
+            const config = this._knownElements[info.statusName];
+            let position = info.originalPosition;
+            let hidden = false;
+            let priority = 5;
+            
+            if (config) {
+                position = this._settings.get_string(config.settingsKey);
+                hidden = this._settings.get_boolean(config.hideKey);
+                priority = this._settings.get_int(config.priorityKey);
+            } else {
+                position = this._settings.get_string('thirdparty-position');
+                priority = this._settings.get_int('thirdparty-priority');
+                hidden = this._settings.get_boolean('hide-thirdparty');
+            }
+            
+            if (!hidden && byPosition[position]) {
+                byPosition[position].push({
+                    container: info.container,
+                    priority: priority
+                });
             }
         });
         
@@ -270,8 +370,8 @@ var SystemIndicators = class SystemIndicators {
             
             // Добавляем в нужный box
             const box = this._getBoxForPosition(pos);
-            byPosition[pos].forEach(info => {
-                box.add_child(info.container);
+            byPosition[pos].forEach(item => {
+                box.add_child(item.container);
             });
         }
     }

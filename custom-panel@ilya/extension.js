@@ -9,28 +9,20 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const { PanelManager } = Me.imports.panelManager;
 
-let panelManager = null;
-
 function init() {
-    log('Panel Margins: init()');
+    log('Extension: init()');
 }
 
 function enable() {
-    log('Panel Margins: enable()');
-    
+    log('Extension: enable()');
     panelManager = new PanelManager();
     panelManager.enable();
-    
-    log('Panel Margins: enabled successfully');
 }
 
 function disable() {
-    log('Panel Margins: disable()');
-    
+    log('Extension: disable()');
     if (panelManager) {
         panelManager.disable();
         panelManager = null;
     }
-    
-    log('Panel Margins: disabled');
 }

@@ -1,8 +1,8 @@
 {
-  "description": "Полная кастомизация панели GNOME: позиционирование, стилизация, управление виджетами",
+  "description": "Добавляет отступы к стандартной верхней панели",
   "name": "Custom Panel",
   "shell-version": ["43"],
   "uuid": "dash-to-panel-custom@ilya",
-  "version": 2,
+  "version": 1,
   "settings-schema": "org.gnome.shell.extensions.panel-margins"
 }

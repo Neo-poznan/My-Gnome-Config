@@ -24,10 +24,18 @@ var DistroIcon = class DistroIcon {
     }
     
     /**
-     * Включает иконку и добавляет её на панель
+     * Геттер для контейнера
+     */
+    get container() {
+        return this._container;
+    }
+    
+    /**
+     * Создаёт виджет без добавления на панель
+     * (позиционирование управляется через WidgetPositioner)
      * @param {Panel} panel - наша кастомная панель
      */
-    enable(panel) {
+    createWidget(panel) {
         this._panel = panel;
         this._settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.panel-margins');
         
@@ -61,16 +69,24 @@ var DistroIcon = class DistroIcon {
         } else {
             log(`[Custom Panel] Distro icon not found: ${iconPath}`);
         }
+    }
+    
+    /**
+     * @deprecated Используйте createWidget() + WidgetPositioner
+     * Включает иконку и добавляет её на панель
+     * @param {Panel} panel - наша кастомная панель
+     */
+    enable(panel) {
+        this.createWidget(panel);
         
-        // Добавляем в нужную позицию
-        this._updatePosition();
-        
-        // Слушаем изменения настроек
+        // Слушаем изменения настроек (для обратной совместимости)
         this._settingsChangedId = this._settings.connect('changed', (settings, key) => {
             if (key === 'distro-icon-position' || key === 'hide-distro-icon' || key === 'distro-icon-priority') {
                 this._updatePosition();
             }
         });
+        
+        this._updatePosition();
     }
     
     /**

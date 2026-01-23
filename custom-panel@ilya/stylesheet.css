@@ -1,0 +1,139 @@
+.panel-custom .system-status-icon {
+    icon-size: 15px;
+    padding: 3px;
+}
+
+.panel-custom .widget-container {
+    font-weight: bold;
+    color: #ffffff;
+    transition-duration: 100ms;
+    border-radius: 8px; 
+    padding: 4px 8px;
+}
+
+.panel-custom .widget-container:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel-taskbar {
+    spacing: 4px;
+    padding: 0 4px;
+}
+
+/* Кнопки приложений */
+.panel-taskbar .panel-button,
+.show-apps.panel-button {
+    padding: 4px 8px;
+    border-radius: 8px;
+    margin: 4px 0;
+}
+
+.panel-taskbar .panel-button:hover,
+.show-apps.panel-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel-taskbar .panel-button:active,
+.show-apps.panel-button:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Кнопка иконки - без собственного фона */
+.taskbar-icon-button {
+    padding: 2px;
+    background-color: transparent;
+    border-radius: 4px;
+}
+
+.taskbar-icon-button:hover,
+.taskbar-icon-button:focus,
+.taskbar-icon-button:active {
+    background-color: transparent;
+}
+
+/* Иконка приложения */
+.taskbar-app-icon {
+    transition-duration: 150ms;
+}
+
+/* ============ Разделитель между избранными и запущенными ============ */
+.taskbar-separator {
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 6px;
+}
+
+/* ============ Индикатор окон (точки) ============ */
+.window-indicator {
+    spacing: 3px;
+    height: 4px;
+}
+
+.window-indicator-dot {
+    width: 6px;
+    height: 3px;
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+
+/* ============ Popup превью окон ============ */
+.window-preview-popup {
+    background-color: rgba(36, 36, 36, 0.95);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.window-preview-content {
+    spacing: 6px;
+}
+
+.window-preview-item {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.window-preview-item.hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.window-preview-header {
+    spacing: 6px;
+    padding-bottom: 4px;
+}
+
+.window-preview-icon {
+    margin-right: 4px;
+}
+
+.window-preview-title {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 200px;
+}
+
+.window-preview-close {
+    background-color: transparent;
+    border-radius: 50%;
+    padding: 2px;
+    min-width: 18px;
+    min-height: 18px;
+}
+
+.window-preview-close:hover {
+    background-color: rgba(255, 80, 80, 0.8);
+}
+
+.window-preview-close StIcon {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.window-preview-close:hover StIcon {
+    color: #ffffff;
+}
+
+.window-preview-thumbnail {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}

@@ -45,8 +45,6 @@
 .panel-custom .system-status-icon {
     icon-size: 16px;
     padding: 15px 2px;
-    padding-top: 20px;
-    padding-bottom: 20px;
 }
 
 /* Контейнер таскбара */
@@ -205,4 +203,119 @@
 .window-preview-thumbnail {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 6px;
+}
+
+/* Системный монитор */
+.system-monitor-container {
+    spacing: 8px;
+    padding: 8px 6px;
+    border-radius: 6px;
+    transition-duration: 150ms;
+    min-width: 180px;
+}
+
+.system-monitor-container:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.system-monitor-container:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.system-monitor-label {
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: normal;
+    text-align: center;
+}
+
+.system-monitor-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Специальные стили для разных типов данных */
+
+/* Медиа плеер */
+.media-player-button {
+    spacing: 6px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    max-width: 320px;
+    transition-duration: 150ms;
+    margin: 0px;
+}
+
+.media-player-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.media-player-button:active {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.media-player-container {
+    spacing: 6px;
+    padding: 6px;
+}
+
+.media-player-cover {
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.media-player-text {
+    spacing: 1px;
+    min-width: 120px;
+    max-width: 180px;    
+    y-align: center;
+}
+
+.media-player-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    y-align: center;
+}
+
+.media-player-artist {
+    font-size: 10px;
+    color: #cccccc;
+    y-align: center;
+}
+
+.media-player-controls {
+    spacing: 2px;
+}
+
+.media-player-control-button {
+    padding: 2px;
+    border-radius: 2px;
+    background-color: transparent;
+    transition-duration: 100ms;
+}
+
+.media-player-control-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.media-player-control-button:active {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+.memory-label {
+    color: rgba(100, 180, 255, 1.0); /* Голубой для памяти */
+}
+
+.cpu-label {
+    color: rgba(120, 255, 120, 1.0); /* Зелёный для CPU */
+}
+
+.cpu-temp-label {
+    color: rgba(255, 180, 100, 1.0); /* Оранжевый для температуры CPU */
+}
+
+.gpu-temp-label {
+    color: rgba(255, 120, 180, 1.0); /* Розовый для GPU */
 }

@@ -68,6 +68,10 @@ class Panel extends St.BoxLayout {
         return this._rightBox;
     }
     
+    get panelHeight() {
+        return this._settings.get_int('panel-thickness');
+    }
+    
     /**
      * Применяет геометрию панели
      * @param {Object} geom - объект с полями: thickness, marginTop, panelWidth, screenWidth, position
@@ -82,10 +86,8 @@ class Panel extends St.BoxLayout {
         const horizontalOffset = (screenWidth - panelWidth) / 2;
         
         if (position === 'bottom') {
-            // Для нижней панели отступ снизу
-            this.set_style(`margin-left: ${horizontalOffset}px; margin-top: ${marginTop}px;`);
+            this.set_style(`margin-left: ${horizontalOffset}px; margin-top: ${marginTop}px; margin-bottom: ${marginTop};`);
         } else {
-            // Для верхней панели отступ сверху
             this.set_style(`margin-left: ${horizontalOffset}px; margin-top: ${marginTop}px;`);
         }
         
@@ -117,7 +119,7 @@ class Panel extends St.BoxLayout {
         const bgStyle = `background-color: rgba(${r}, ${g}, ${b}, ${alpha});`;
         const radiusStyle = `border-radius: ${borderRadius}px;`;
         
-        // Удаляем старые стили и добавляем новые
+        // Удаляем старые стили background и radius, сохраняя остальные (margin-top, margin-left)
         let newStyle = currentStyle
             .replace(/background-color:[^;]+;/g, '')
             .replace(/border-radius:[^;]+;/g, '');

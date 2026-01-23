@@ -1,0 +1,8 @@
+{
+  "description": "Добавляет в gnome кастомную панель задач",
+  "name": "Custom Panel 2",
+  "shell-version": ["43"],
+  "uuid": "custom-panel@ilya",
+  "version": 1,
+  "settings-schema": "org.gnome.shell.extensions.panel-margins"
+}

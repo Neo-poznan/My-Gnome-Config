@@ -134,6 +134,12 @@
       <description>Position of the distribution icon</description>
     </key>
     
+    <key name="sysmon-position" type="s">
+      <default>'right'</default>
+      <summary>System monitor position</summary>
+      <description>Position of the system monitor widget</description>
+    </key>
+    
     <!-- Приоритеты виджетов (порядок внутри блока) -->
     <key name="showapps-priority" type="i">
       <default>1</default>
@@ -198,6 +204,13 @@
       <range min="1" max="10"/>
     </key>
     
+    <key name="sysmon-priority" type="i">
+      <default>4</default>
+      <summary>System monitor priority</summary>
+      <description>Order priority within the position block (lower = first)</description>
+      <range min="1" max="10"/>
+    </key>
+    
     <!-- Скрытие виджетов -->
     <key name="hide-showapps" type="b">
       <default>false</default>
@@ -239,6 +252,11 @@
       <summary>Hide distro icon</summary>
     </key>
     
+    <key name="hide-sysmon" type="b">
+      <default>false</default>
+      <summary>Hide system monitor</summary>
+    </key>
+    
     <key name="hide-thirdparty" type="b">
       <default>false</default>
       <summary>Hide third-party indicators</summary>
@@ -249,6 +267,32 @@
       <default>''</default>
       <summary>Hidden indicators</summary>
       <description>Comma-separated list of hidden indicator names</description>
+    </key>
+    
+    <key name="sysmon-font-size" type="i">
+      <default>11</default>
+      <summary>System monitor font size</summary>
+      <description>Font size for system monitor widget in pixels</description>
+      <range min="8" max="18"/>
+    </key>
+    
+    <key name="media-player-position" type="s">
+      <default>'right'</default>
+      <summary>Media player position</summary>
+      <description>Position of the media player widget</description>
+    </key>
+    
+    <key name="media-player-priority" type="i">
+      <default>8</default>
+      <summary>Media player priority</summary>
+      <description>Priority of the media player widget</description>
+      <range min="1" max="10"/>
+    </key>
+    
+    <key name="hide-media-player" type="b">
+      <default>false</default>
+      <summary>Hide media player</summary>
+      <description>Hide the media player widget</description>
     </key>
     
   </schema>
