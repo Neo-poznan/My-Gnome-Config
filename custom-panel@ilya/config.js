@@ -57,7 +57,7 @@ var config = {
             "position": "center",
             "priority": 1,
             "height": 50,
-            "width": 420,
+            "width": 460,
             "trackHover": false,
         }
     }
