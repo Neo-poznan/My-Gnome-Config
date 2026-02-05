@@ -32,23 +32,22 @@ var Taskbar = class Taskbar {
      * (позиционирование управляется через WidgetPositioner)
      * @param {Panel} panel - наша кастомная панель
      */
-    createWidgets(panel) {
-        this._panel = panel;
+    createWidgets() {
         
         // Получаем размер иконок из настроек
         this._iconSize = 30;
         
-        // Создаем кнопку показа приложений
-        this._showAppsButton = this._createShowAppsButton();
-        
         // Создаем контейнер таскбара
         this._container = new St.BoxLayout({
+            name: 'taskbar',
             style_class: 'panel-taskbar',
             x_expand: false,
             y_expand: true,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER
         });
+
+        log(this.container, 'container name');
         
         // Заполняем таскбар
         this._updateApps();
@@ -103,7 +102,10 @@ var Taskbar = class Taskbar {
      * Геттер для контейнера таскбара
      */
     get container() {
-        return this._container;
+        const widgetData = {
+            container: this._container,
+        };
+        return widgetData;
     }
     
     disable() {
@@ -214,7 +216,7 @@ var Taskbar = class Taskbar {
             style_class: 'show-apps-icon',
             icon_size: this._iconSize
         });
-        button._icon.set_size(this._iconSize, this._iconSize);
+        button._icon.set_size(33, 37);
         
         button.set_child(button._icon);
         
@@ -269,7 +271,7 @@ var Taskbar = class Taskbar {
         button.connect('notify::hover', () => {
             if (button.hover) {
                 button._icon.ease({
-                    translation_y: -3,
+                    translation_y: -6,
                     duration: 150,
                     mode: Clutter.AnimationMode.EASE_OUT_QUAD
                 });
@@ -324,6 +326,11 @@ var Taskbar = class Taskbar {
             } else {
                 // Запускаем приложение
                 app.activate();
+                // Выходим из обзора, если открыт
+                if (Main.overview.visible) {
+                    Main.overview.hide();
+                }
+                
             }
         });
         
@@ -548,6 +555,8 @@ var Taskbar = class Taskbar {
                 });
             }
         });
+
+        this._container.add_child(this._createShowAppsButton());
         
         // Создаём кнопки для избранных
         favoriteApps.forEach(info => {

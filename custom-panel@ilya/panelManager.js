@@ -4,49 +4,43 @@ const Meta = imports.gi.Meta;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const { Panel } = Me.imports.panel;
-const { SystemWidgets } = Me.imports.systemWidgets;
-const { Taskbar } = Me.imports.taskbar;
+const { WidgetsManager } = Me.imports.widgetsManager;
 
 var PanelManager = class PanelManager {
-    constructor() {
+    constructor(config) {
         this._marginTop = null;
         this._marginBottom = null;
         this._height = null; 
         this._panel = null;
+        this.config = config;
     }
 
     enable() {
         log('PanelManager: enable();')
-
         this._originalPanelBox = Main.layoutManager.panelBox;
         this._originalPanelBoxWidth = this._originalPanelBox.width;
         this._originalPanelBoxHeight = this._originalPanelBox.height;
         this._originalMainPanelVisible = Main.panel.visible;
-        this.widgets = new SystemWidgets();
-
-        this._taskbar = new Taskbar();
-        this._taskbar.createWidgets(this._panel);
-
+        
         Main.panel.visible = false;
-        this._panel = new Panel();
+        this._panel = new Panel(this.config);
+
+        this._widgetsManager = new WidgetsManager(this.config);
+        this._widgetsManager.addAllWidgets(this._panel);
 
         const monitor = Main.layoutManager.primaryMonitor;
-        this._originalPanelBox.set_size(monitor.width, 84);
+        this._originalPanelBox.set_size(monitor.width, this.config.panelThickness + 2 * this.config.verticalMargins);
         this._originalPanelBox.set_position(monitor.x, monitor.y);
         this._panel.applyGeometry();
 
-            
         // Добавляем в верхний panelBox
         this._originalPanelBox.add_child(this._panel);
-        this.widgets.enable(this._panel.leftBox);
-
-        this._panel.centerBox.add_child(this._taskbar.container);
 
     }
 
     disable() {
         log('PanelManager: disable();')
-        this.widgets.disable();
+        this._widgetsManager.restoreOriginalWidgets();
         if (this._panel) {
             const parent = this._panel.get_parent();
             if (parent) {

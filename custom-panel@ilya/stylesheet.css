@@ -3,12 +3,21 @@
     padding: 3px;
 }
 
+.panel-custom-center, .panel-custom-left, .panel-custom-right {
+    spacing: 10px;
+}
+
 .panel-custom .widget-container {
     font-weight: bold;
     color: #ffffff;
     transition-duration: 100ms;
     border-radius: 8px; 
     padding: 4px 8px;
+}
+
+.panel-custom .widget-container-ArcMenu {
+    padding: 2px;
+    border-radius: 10px;
 }
 
 .panel-custom .widget-container:hover {
@@ -19,6 +28,7 @@
     spacing: 4px;
     padding: 0 4px;
 }
+
 
 /* Кнопки приложений */
 .panel-taskbar .panel-button,
@@ -136,4 +146,51 @@
 .window-preview-thumbnail {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 6px;
+}
+
+
+/* Системный монитор */
+.system-monitor-container {
+    spacing: 8px;
+    padding: 8px 6px;
+    border-radius: 6px;
+    transition-duration: 150ms;
+    min-width: 180px;
+}
+
+.system-monitor-container:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.system-monitor-container:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.system-monitor-label {
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: normal;
+    text-align: center;
+}
+
+.system-monitor-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+    text-align: center;
+}
+
+.memory-label {
+    color: rgba(100, 180, 255, 1.0); /* Голубой для памяти */
+}
+
+.cpu-label {
+    color: rgba(120, 255, 120, 1.0); /* Зелёный для CPU */
+}
+
+.cpu-temp-label {
+    color: rgba(255, 180, 100, 1.0); /* Оранжевый для температуры CPU */
+}
+
+.gpu-temp-label {
+    color: rgba(255, 120, 180, 1.0); /* Розовый для GPU */
 }
