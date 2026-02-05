@@ -33,9 +33,7 @@
 /* Кнопки приложений */
 .panel-taskbar .panel-button,
 .show-apps.panel-button {
-    padding: 4px 8px;
     border-radius: 8px;
-    margin: 4px 0;
 }
 
 .panel-taskbar .panel-button:hover,
@@ -193,4 +191,68 @@
 
 .gpu-temp-label {
     color: rgba(255, 120, 180, 1.0); /* Розовый для GPU */
+}
+
+/* ============ Медиаплеер ============ */
+.media-player-container {
+    spacing: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition-duration: 150ms;
+}
+
+.media-player-container:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.media-player-cover {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    icon-size: 32px;
+}
+
+.media-player-cover.fallback {
+    icon-size: 24px;
+    padding: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.media-player-play-button {
+    width: 28px;
+    height: 28px;
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 0;
+}
+
+.media-player-play-button:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.media-player-play-button:active {
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.media-player-play-icon {
+    icon-size: 16px;
+    color: #ffffff;
+}
+
+.media-player-text-box {
+    spacing: 2px;
+}
+
+.media-player-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffffff;
+    max-width: 160px;
+}
+
+.media-player-artist {
+    font-size: 10px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 160px;
 }

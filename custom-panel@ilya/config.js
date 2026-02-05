@@ -3,7 +3,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 var config = {
     "leftBoxMarginPercent": 0.16,
-    "rightBoxMarginPercent": 0.3,
+    "rightBoxMarginPercent": 0.25,
     "panelThickness": 60,
     "verticalMargins": 7,
     "horizontalMargins": 10,
@@ -13,7 +13,7 @@ var config = {
             "position": "left",
             "hide": false,
             "priority": 2,
-            "width": 70,
+            "width": 60,
         },
         "appMenu": {
             "position": "left",
@@ -58,6 +58,13 @@ var config = {
             "priority": 1,
             "height": 50,
             "width": 460,
+            "trackHover": false,
+        },
+        "mediaPlayer": {
+            "position": "center",
+            "priority": 2,
+            "height": 46,
+            "width": 280,
             "trackHover": false,
         }
     }

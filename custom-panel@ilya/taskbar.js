@@ -216,7 +216,7 @@ var Taskbar = class Taskbar {
             style_class: 'show-apps-icon',
             icon_size: this._iconSize
         });
-        button._icon.set_size(33, 37);
+        button._icon.set_size(40, 40);
         
         button.set_child(button._icon);
         

@@ -9,6 +9,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 const { SystemWidgets } = Me.imports.systemWidgets;
 const { SystemMonitor } = Me.imports.systemMonitor;
 const { Taskbar } = Me.imports.taskbar;
+const { MediaPlayer } = Me.imports.mediaPlayer;
 
 
 var WidgetsManager = class WidgetsManager {
@@ -48,9 +49,13 @@ var WidgetsManager = class WidgetsManager {
         this._systemMonitor = new SystemMonitor();
         this._systemMonitor.createWidget();
         
+        this._mediaPlayer = new MediaPlayer(this.config);
+        this._mediaPlayer.createWidget();
+        
         this._widgets = this._systemWidgets.getWidgets();
         this._widgets['taskbar'] = this._taskbar.container;
         this._widgets['systemMonitor'] = this._systemMonitor.container;
+        this._widgets['mediaPlayer'] = this._mediaPlayer.container;
         this.addWidgets(panel, this._widgets);
     }
 
@@ -120,6 +125,10 @@ var WidgetsManager = class WidgetsManager {
         if (this._systemMonitor) {
             this._systemMonitor.disable();
             this._systemMonitor = null;
+        }
+        if (this._mediaPlayer) {
+            this._mediaPlayer.disable();
+            this._mediaPlayer = null;
         }
         this._taskbar.disable();
     }
