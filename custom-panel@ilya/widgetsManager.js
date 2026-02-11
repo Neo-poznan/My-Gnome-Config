@@ -107,7 +107,7 @@ export class WidgetsManager {
                 widgetContainer.add_child(item.container);
                 const box = this._getWidgetBox(widgetName, panel);
                 box.add_child(widgetContainer);
-                
+           
             }
         }
     } 

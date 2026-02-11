@@ -5,6 +5,7 @@ import GLib from 'gi://GLib';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as AppMenu from 'resource:///org/gnome/shell/ui/appMenu.js';
 
 import { WindowPreviewPopup } from './windowPreview.js';
 
@@ -329,12 +330,12 @@ export class Taskbar {
         });
         
         // Правый клик - контекстное меню
-        iconButton.connect('button-release-event', (actor, event) => {
+        button.connect('button-press-event', (actor, event) => {
             if (event.get_button() === 3) { // Правый клик
                 if (this._windowPreview) {
                     this._windowPreview.hideImmediately();
                 }
-                this._showAppContextMenu(event, app, button);
+                this._showAppContextMenu(app, button);
                 return Clutter.EVENT_STOP;
             }
             return Clutter.EVENT_PROPAGATE;
@@ -344,87 +345,32 @@ export class Taskbar {
     }
     
     /**
-     * Показывает контекстное меню приложения
+     * Показывает контекстное меню приложения (стандартное GNOME AppMenu)
      */
-    _showAppContextMenu(event, app, button) {
+    _showAppContextMenu(app, sourceActor) {
         this._closeContextMenu();
         
-        const [x, y] = event.get_coords();
+        // Создаём стандартное меню приложения GNOME
+        this._contextMenu = new AppMenu.AppMenu(sourceActor, St.Side.TOP, {
+            favoritesSection: true,
+            showSingleWindows: true,
+        });
         
-        // Создаём контекстное меню
-        this._contextMenu = new PopupMenu.PopupMenu(button, 0, St.Side.TOP);
-        
-        // Пункт "Открыть новое окно"
-        if (app.can_open_new_window && app.can_open_new_window()) {
-            const newWindowItem = new PopupMenu.PopupMenuItem('Открыть новое окно');
-            newWindowItem.connect('activate', () => {
-                app.open_new_window(-1);
-            });
-            this._contextMenu.addMenuItem(newWindowItem);
-        }
-        
-        // Разделитель
-        this._contextMenu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        
-        // Избранное
-        const favorites = AppFavorites.getAppFavorites();
-        const appId = app.get_id();
-        const isFavorite = favorites.isFavorite(appId);
-        
-        if (isFavorite) {
-            const removeFromFavItem = new PopupMenu.PopupMenuItem('Удалить из избранного');
-            removeFromFavItem.connect('activate', () => {
-                favorites.removeFavorite(appId);
-            });
-            this._contextMenu.addMenuItem(removeFromFavItem);
-        } else {
-            const addToFavItem = new PopupMenu.PopupMenuItem('Добавить в избранное');
-            addToFavItem.connect('activate', () => {
-                favorites.addFavorite(appId);
-            });
-            this._contextMenu.addMenuItem(addToFavItem);
-        }
-        
-        // Закрыть все окна
-        const windows = app.get_windows().filter(w => !w.skip_taskbar);
-        if (windows.length > 0) {
-            this._contextMenu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-            
-            const closeAllItem = new PopupMenu.PopupMenuItem(
-                windows.length === 1 ? 'Закрыть окно' : 'Закрыть все окна'
-            );
-            closeAllItem.connect('activate', () => {
-                windows.forEach(w => w.delete(global.get_current_time()));
-            });
-            this._contextMenu.addMenuItem(closeAllItem);
-        }
+        // Устанавливаем приложение
+        this._contextMenu.setApp(app);
         
         // Добавляем меню на сцену
-        Main.uiGroup.add_actor(this._contextMenu.actor);
-        
-        // Позиционируем меню относительно кнопки
-        const [buttonX, buttonY] = button.get_transformed_position();
-        const panelPosition = 'top';
-        
-        if (panelPosition === 'bottom') {
-            this._contextMenu.actor.set_position(
-                Math.floor(buttonX), 
-                Math.floor(buttonY - this._contextMenu.actor.height - 8)
-            );
-        } else {
-            this._contextMenu.actor.set_position(
-                Math.floor(buttonX), 
-                Math.floor(buttonY + button.height + 8)
-            );
-        }
+        Main.uiGroup.add_child(this._contextMenu.actor);
         
         // Обработчик закрытия меню
         this._contextMenu.connect('open-state-changed', (menu, isOpen) => {
             if (!isOpen) {
                 this._removeGlobalClickHandler();
                 GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
-                    if (this._contextMenu && this._contextMenu.actor) {
-                        Main.uiGroup.remove_actor(this._contextMenu.actor);
+                    if (this._contextMenu) {
+                        if (this._contextMenu.actor.get_parent()) {
+                            Main.uiGroup.remove_child(this._contextMenu.actor);
+                        }
                         this._contextMenu.destroy();
                         this._contextMenu = null;
                     }
