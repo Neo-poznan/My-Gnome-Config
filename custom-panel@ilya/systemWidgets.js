@@ -1,13 +1,10 @@
-const Main = imports.ui.main;
-const GLib = imports.gi.GLib;
-const Meta = imports.gi.Meta;
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-var SystemWidgets = class SystemWidgets{
+export class SystemWidgets {
 
     constructor(config) {
         this.config = config;

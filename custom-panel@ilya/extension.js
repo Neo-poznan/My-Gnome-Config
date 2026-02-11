@@ -5,25 +5,24 @@
    journalctl --user  -n 50
  */
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const { PanelManager } = Me.imports.panelManager;
-const { config } = Me.imports.config;
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { PanelManager } from './panelManager.js';
+import { config } from './config.js';
 
-function init() {
-    log('Extension: init()');
-}
+let panelManager = null;
 
-function enable() {
-    log('Extension: enable()');
-    panelManager = new PanelManager(config);
-    panelManager.enable();
-}
+export default class CustomPanelExtension extends Extension {
+    enable() {
+        console.log('Extension: enable()');
+        panelManager = new PanelManager(config);
+        panelManager.enable();
+    }
 
-function disable() {
-    log('Extension: disable()');
-    if (panelManager) {
-        panelManager.disable();
-        panelManager = null;
+    disable() {
+        console.log('Extension: disable()');
+        if (panelManager) {
+            panelManager.disable();
+            panelManager = null;
+        }
     }
 }

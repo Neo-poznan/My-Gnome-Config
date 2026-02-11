@@ -1,12 +1,9 @@
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const Main = imports.ui.main;
-const GObject = imports.gi.GObject;
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import GObject from 'gi://GObject';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-var Panel = GObject.registerClass(
+export const Panel = GObject.registerClass(
 class Panel extends St.BoxLayout {
     _init(config) {
         super._init({
@@ -58,13 +55,13 @@ class Panel extends St.BoxLayout {
     }
 
     applyGeometry() {
-        log('Config:', JSON.stringify(this.config, null, 2));
+        console.log('Config:', JSON.stringify(this.config, null, 2));
         const monitor = Main.layoutManager.primaryMonitor;
         const screenWidth = monitor.width;
         const thickness = this.config.panelThickness;
         const verticalMargins = this.config.verticalMargins;
         const horizontalMargins = this.config.horizontalMargins;
-        log('screenWidth:', screenWidth, 'thickness:', thickness, 'verticalMargins:', verticalMargins, 'horizontalMargins:', horizontalMargins);
+        console.log('screenWidth:', screenWidth, 'thickness:', thickness, 'verticalMargins:', verticalMargins, 'horizontalMargins:', horizontalMargins);
         this.set_size(screenWidth - 2 * horizontalMargins, thickness);
         this.set_style(`
             background-color: rgba(60, 60, 74, 0.9); 

@@ -8,13 +8,14 @@
  * - Температура GPU: в °C
  */
 
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
-const ExtensionUtils = imports.misc.extensionUtils;
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
-var SystemMonitor = class SystemMonitor {
+export class SystemMonitor {
     constructor() {
         this._panel = null;
         this._container = null;
@@ -210,7 +211,7 @@ var SystemMonitor = class SystemMonitor {
             this._updateCpuTemp();
             this._updateGpuTemp();
         } catch (e) {
-            log(`[SystemMonitor] Error updating info: ${e}`);
+            console.log(`[SystemMonitor] Error updating info: ${e}`);
         }
     }
     
@@ -224,7 +225,7 @@ var SystemMonitor = class SystemMonitor {
             
             if (!success) return;
             
-            const meminfo = imports.byteArray.toString(contents);
+            const meminfo = new TextDecoder().decode(contents);
             const lines = meminfo.split('\n');
             
             let totalKB = 0;
@@ -247,7 +248,7 @@ var SystemMonitor = class SystemMonitor {
                 this._memoryLabel.set_text(`RAM: ${usedGB}/${totalGB}GB (${usedPercent}%)`);
             }
         } catch (e) {
-            log(`[SystemMonitor] Memory info error: ${e}`);
+            console.log(`[SystemMonitor] Memory info error: ${e}`);
             this._memoryLabel.set_text('RAM: Error');
         }
     }
@@ -262,7 +263,7 @@ var SystemMonitor = class SystemMonitor {
             
             if (!success) return;
             
-            const stat = imports.byteArray.toString(contents);
+            const stat = new TextDecoder().decode(contents);
             const firstLine = stat.split('\n')[0];
             
             // cpu  user nice system idle iowait irq softirq steal guest guest_nice
@@ -285,7 +286,7 @@ var SystemMonitor = class SystemMonitor {
             this._lastCpuIdle = idle;
             
         } catch (e) {
-            log(`[SystemMonitor] CPU info error: ${e}`);
+            console.log(`[SystemMonitor] CPU info error: ${e}`);
             this._cpuLabel.set_text('CPU: Error');
         }
     }
@@ -309,7 +310,7 @@ var SystemMonitor = class SystemMonitor {
                     if (file.query_exists(null)) {
                         const [success, contents] = file.load_contents(null);
                         if (success) {
-                            const tempStr = imports.byteArray.toString(contents).trim();
+                            const tempStr = new TextDecoder().decode(contents).trim();
                             let temp = parseInt(tempStr);
                             
                             // Некоторые источники дают температуру в миллиградусах
@@ -333,7 +334,7 @@ var SystemMonitor = class SystemMonitor {
             this._cpuTempLabel.set_text('--°C');
             
         } catch (e) {
-            log(`[SystemMonitor] CPU temp error: ${e}`);
+            console.log(`[SystemMonitor] CPU temp error: ${e}`);
             this._cpuTempLabel.set_text('--°C');
         }
     }
@@ -346,7 +347,7 @@ var SystemMonitor = class SystemMonitor {
             // Пробуем получить температуру через разные методы
             this._tryGetGpuTemp();
         } catch (e) {
-            log(`[SystemMonitor] GPU temp error: ${e}`);
+            console.log(`[SystemMonitor] GPU temp error: ${e}`);
             this._gpuTempLabel.set_text('GPU: --°C');
         }
     }
@@ -420,7 +421,7 @@ var SystemMonitor = class SystemMonitor {
                     if (nameFile.query_exists(null)) {
                         const [success, contents] = nameFile.load_contents(null);
                         if (success) {
-                            const deviceName = imports.byteArray.toString(contents).trim().toLowerCase();
+                            const deviceName = new TextDecoder().decode(contents).trim().toLowerCase();
                             
                             // Ищем AMD GPU устройства
                             if (deviceName.includes('amdgpu') || deviceName.includes('radeon')) {
@@ -429,7 +430,7 @@ var SystemMonitor = class SystemMonitor {
                                 if (tempFile.query_exists(null)) {
                                     const [tempSuccess, tempContents] = tempFile.load_contents(null);
                                     if (tempSuccess) {
-                                        const temp = Math.round(parseInt(imports.byteArray.toString(tempContents).trim()) / 1000);
+                                        const temp = Math.round(parseInt(new TextDecoder().decode(tempContents).trim()) / 1000);
                                         if (temp > 0 && temp < 150) {
                                             this._gpuTempLabel.set_text(`GPU: ${temp}°C`);
                                             found = true;
@@ -471,35 +472,64 @@ var SystemMonitor = class SystemMonitor {
      * Открывает системный монитор (bottom/btm)
      */
     _openSystemMonitor() {
+        // Получаем терминал из настроек GNOME
+        let terminalExec = 'gnome-terminal';
         try {
-            // Пробуем запустить btm
-            const proc = Gio.Subprocess.new(
-                ['gnome-terminal', '--', 'btm'],
-                Gio.SubprocessFlags.NONE
-            );
-            
-            log('[SystemMonitor] Opened bottom (btm) in terminal');
-            
+            const terminalSettings = new Gio.Settings({
+                schema_id: 'org.gnome.desktop.default-applications.terminal',
+            });
+            terminalExec = terminalSettings.get_string('exec');
         } catch (e) {
-            log(`[SystemMonitor] Failed to open btm: ${e}`);
-            
-            // Fallback: пробуем htop
-            try {
-                const proc = Gio.Subprocess.new(
-                    ['gnome-terminal', '--', 'htop'],
-                    Gio.SubprocessFlags.NONE
-                );
-                
-                log('[SystemMonitor] Opened htop as fallback');
-                
-            } catch (e2) {
-                log(`[SystemMonitor] Failed to open htop as fallback: ${e2}`);
-                
-                // Last resort: показываем уведомление
-                this._showNotification('Системный монитор', 
-                    'Не удалось запустить btm или htop. Установите bottom: apt install bottom');
+            console.log('[SystemMonitor] Could not get terminal from settings, trying common terminals');
+        }
+
+        // Список терминалов для попытки (в порядке предпочтения)
+        const terminals = [
+            terminalExec,
+            'kgx',           // GNOME Console
+            'gnome-terminal',
+            'konsole',
+            'xfce4-terminal',
+            'alacritty',
+            'kitty',
+            'tilix',
+            'terminator',
+            'xterm',
+        ];
+
+        // Список системных мониторов для попытки
+        const monitors = ['btm', 'htop', 'top'];
+
+        for (const terminal of terminals) {
+            for (const monitor of monitors) {
+                try {
+                    // Определяем аргументы в зависимости от терминала
+                    let args;
+                    if (terminal.includes('konsole')) {
+                        args = [terminal, '-e', monitor];
+                    } else if (terminal.includes('alacritty') || terminal.includes('kitty')) {
+                        args = [terminal, '-e', monitor];
+                    } else if (terminal.includes('kgx')) {
+                        args = [terminal, '--', monitor];
+                    } else {
+                        // Для большинства терминалов (gnome-terminal, xfce4-terminal, etc.)
+                        args = [terminal, '--', monitor];
+                    }
+
+                    Gio.Subprocess.new(args, Gio.SubprocessFlags.NONE);
+                    console.log(`[SystemMonitor] Opened ${monitor} in ${terminal}`);
+                    return;
+                } catch (e) {
+                    // Пробуем следующую комбинацию
+                    continue;
+                }
             }
         }
+
+        // Если ничего не сработало
+        console.log('[SystemMonitor] Could not open any system monitor');
+        this._showNotification('Системный монитор', 
+            'Не удалось открыть системный монитор. Установите btm или htop.');
     }
     
     /**
@@ -507,10 +537,12 @@ var SystemMonitor = class SystemMonitor {
      */
     _showNotification(title, body) {
         try {
-            const notification = new imports.ui.messageTray.Notification(null, title, body);
-            imports.ui.main.messageTray.add(notification);
+            const source = new MessageTray.Source({ title });
+            Main.messageTray.add(source);
+            const notification = new MessageTray.Notification({ source, title, body });
+            source.addNotification(notification);
         } catch (e) {
-            log(`[SystemMonitor] Notification error: ${e}`);
+            console.log(`[SystemMonitor] Notification error: ${e}`);
         }
     }
-};
+}

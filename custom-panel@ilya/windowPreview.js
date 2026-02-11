@@ -3,13 +3,13 @@
  * Основан на dash-to-panel windowPreview.js
  */
 
-const St = imports.gi.St;
-const Main = imports.ui.main;
-const Clutter = imports.gi.Clutter;
-const GLib = imports.gi.GLib;
-const Meta = imports.gi.Meta;
-const PopupMenu = imports.ui.popupMenu;
-const Pango = imports.gi.Pango;
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
+import Pango from 'gi://Pango';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 // Размеры превью
 const PREVIEW_WIDTH = 240;
@@ -21,7 +21,7 @@ const HEADER_HEIGHT = 28;
 const POPUP_SHOW_DELAY = 250;
 const POPUP_HIDE_DELAY = 150;
 
-var WindowPreviewPopup = class WindowPreviewPopup {
+export class WindowPreviewPopup {
     constructor() {
         this._popup = null;
         this._showTimeoutId = null;

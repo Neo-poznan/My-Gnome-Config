@@ -1,9 +1,6 @@
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-var config = {
-    "leftBoxMarginPercent": 0.16,
-    "rightBoxMarginPercent": 0.25,
+export const config = {
+    "leftBoxMarginPercent": 0.15,
+    "rightBoxMarginPercent": 0.2,
     "panelThickness": 60,
     "verticalMargins": 7,
     "horizontalMargins": 10,
@@ -11,7 +8,7 @@ var config = {
     "widgets": {
         "activities": {
             "position": "left",
-            "hide": false,
+            "hidden": true,
             "priority": 2,
             "width": 60,
         },
@@ -57,7 +54,7 @@ var config = {
             "position": "center",
             "priority": 1,
             "height": 50,
-            "width": 460,
+            "width": 480,
             "trackHover": false,
         },
         "mediaPlayer": {

@@ -1,12 +1,11 @@
-const Main = imports.ui.main;
-const GLib = imports.gi.GLib;
-const Meta = imports.gi.Meta;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const { Panel } = Me.imports.panel;
-const { WidgetsManager } = Me.imports.widgetsManager;
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-var PanelManager = class PanelManager {
+import { Panel } from './panel.js';
+import { WidgetsManager } from './widgetsManager.js';
+
+export class PanelManager {
     constructor(config) {
         this._marginTop = null;
         this._marginBottom = null;
@@ -16,7 +15,7 @@ var PanelManager = class PanelManager {
     }
 
     enable() {
-        log('PanelManager: enable();')
+        console.log('PanelManager: enable();')
         this._originalPanelBox = Main.layoutManager.panelBox;
         this._originalPanelBoxWidth = this._originalPanelBox.width;
         this._originalPanelBoxHeight = this._originalPanelBox.height;
@@ -39,7 +38,7 @@ var PanelManager = class PanelManager {
     }
 
     disable() {
-        log('PanelManager: disable();')
+        console.log('PanelManager: disable();')
         this._widgetsManager.restoreOriginalWidgets();
         if (this._panel) {
             const parent = this._panel.get_parent();

@@ -1,8 +1,8 @@
 {
   "description": "Добавляет в gnome кастомную панель задач",
   "name": "Custom Panel Reforged",
-  "shell-version": ["43"],
+  "shell-version": ["49"],
   "uuid": "custom-panel@ilya",
-  "version": 1,
+  "version": 2,
   "settings-schema": "org.gnome.shell.extensions.panel-margins"
 }

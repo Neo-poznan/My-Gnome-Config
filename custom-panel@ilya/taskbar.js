@@ -1,16 +1,14 @@
-const St = imports.gi.St;
-const Main = imports.ui.main;
-const Shell = imports.gi.Shell;
-const Clutter = imports.gi.Clutter;
-const GLib = imports.gi.GLib;
-const AppFavorites = imports.ui.appFavorites;
-const PopupMenu = imports.ui.popupMenu;
-const ExtensionUtils = imports.misc.extensionUtils;
+import St from 'gi://St';
+import Shell from 'gi://Shell';
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-const Me = ExtensionUtils.getCurrentExtension();
-const { WindowPreviewPopup } = Me.imports.windowPreview;
+import { WindowPreviewPopup } from './windowPreview.js';
 
-var Taskbar = class Taskbar {
+export class Taskbar {
     constructor() {
         this._panel = null;
         this._settings = null;
@@ -21,7 +19,7 @@ var Taskbar = class Taskbar {
         this._settingsChangedId = null;
         this._windowCreatedId = null;
         this._windowClosedId = null;
-        this._iconSize = 28;
+        this._iconSize = 30; // Стандартный размер иконок, можно сделать настраиваемым
         this._windowPreview = null;
         this._contextMenu = null;
         this._globalClickId = null;
@@ -30,12 +28,8 @@ var Taskbar = class Taskbar {
     /**
      * Создаёт виджеты таскбара без добавления на панель
      * (позиционирование управляется через WidgetPositioner)
-     * @param {Panel} panel - наша кастомная панель
      */
     createWidgets() {
-        
-        // Получаем размер иконок из настроек
-        this._iconSize = 30;
         
         // Создаем контейнер таскбара
         this._container = new St.BoxLayout({
@@ -47,7 +41,7 @@ var Taskbar = class Taskbar {
             y_align: Clutter.ActorAlign.CENTER
         });
 
-        log(this.container, 'container name');
+        console.log(this.container, 'container name');
         
         // Заполняем таскбар
         this._updateApps();
@@ -216,7 +210,7 @@ var Taskbar = class Taskbar {
             style_class: 'show-apps-icon',
             icon_size: this._iconSize
         });
-        button._icon.set_size(40, 40);
+        button._icon.set_size(this._iconSize, this._iconSize);
         
         button.set_child(button._icon);
         

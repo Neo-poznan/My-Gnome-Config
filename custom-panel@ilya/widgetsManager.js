@@ -1,18 +1,16 @@
-const Main = imports.ui.main;
-const GLib = imports.gi.GLib;
-const Meta = imports.gi.Meta;
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const { SystemWidgets } = Me.imports.systemWidgets;
-const { SystemMonitor } = Me.imports.systemMonitor;
-const { Taskbar } = Me.imports.taskbar;
-const { MediaPlayer } = Me.imports.mediaPlayer;
+import { SystemWidgets } from './systemWidgets.js';
+import { SystemMonitor } from './systemMonitor.js';
+import { Taskbar } from './taskbar.js';
+import { MediaPlayer } from './mediaPlayer.js';
 
 
-var WidgetsManager = class WidgetsManager {
+export class WidgetsManager {
 
     constructor(config) {
         this.config = config;
@@ -61,8 +59,12 @@ var WidgetsManager = class WidgetsManager {
 
     addWidgets(panel, widgets) {
         const sortedWidgets = this._sortWidgetsByPriority(Object.keys(widgets));
-        log('Sorted widgets: ' + sortedWidgets);
+        console.log('Sorted widgets: ' + sortedWidgets);
         for (let widgetName of sortedWidgets) {
+            if ( this._isHidden(widgetName) ) {
+                console.log('Widget ' + widgetName + ' is hidden, skipping');
+                continue;
+            }
             if ( this._knownElements.includes(widgetName) ) {
                 const item = widgets[widgetName];
                 const parent = item.container.get_parent();
@@ -82,12 +84,12 @@ var WidgetsManager = class WidgetsManager {
                 widgetContainer.set_size(this._elementsWidth[widgetName], this.elementsHeight[widgetName]);
                 widgetContainer.add_child(item.container);
                 const box = this._getWidgetBox(widgetName, panel);
-                log('Adding widget ' + widgetName + ' to box ' + box.name);
+                console.log('Adding widget ' + widgetName + ' to box ' + box.name);
                 box.add_child(widgetContainer);
             }
             else {
                 const item = widgets[widgetName];
-                log('Unknown widget: ' + widgetName);
+                console.log('Unknown widget: ' + widgetName);
                 const parent = item.container.get_parent();
                 if (parent) {
                     parent.remove_child(item.container);
@@ -110,10 +112,20 @@ var WidgetsManager = class WidgetsManager {
         }
     } 
 
-    _isNeedTrackHover(widgetName) {
-        if (this.config.widgets[widgetName].trackHover === false ) {
+    _isHidden(widgetName) {
+        if (this.config.widgets[widgetName] && this.config.widgets[widgetName].hidden === true ) {
+            return true;
+        }
+        else {
             return false;
         }
+    }
+
+    _isNeedTrackHover(widgetName) {
+        if (this.config.widgets[widgetName] && this.config.widgets[widgetName].trackHover === false) {
+                return false;
+        } 
+        // if the widget is not in config, we will track hover by default
         else {
             return true;
         }
@@ -154,7 +166,7 @@ var WidgetsManager = class WidgetsManager {
 
     _getWidgetBox(widgetName, panel) {
         if (this._knownElements.includes(widgetName)) {
-            log('Getting box for known widget: ' + widgetName);
+            console.log('Getting box for known widget: ' + widgetName);
             const elementConfig = this.config.widgets[widgetName];
             if (elementConfig.position === 'left') {
                 return panel._leftBox;

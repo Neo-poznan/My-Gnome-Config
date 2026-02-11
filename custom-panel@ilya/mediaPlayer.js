@@ -1,4 +1,9 @@
-const { Gio, GObject, Shell, St, Clutter } = imports.gi;
+import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import Pango from 'gi://Pango';
 
 const MPRIS_PLAYER_PREFIX = 'org.mpris.MediaPlayer2.';
 
@@ -195,7 +200,7 @@ class MprisPlayerHandler {
 /**
  * Виджет медиаплеера для панели
  */
-var MediaPlayer = class MediaPlayer {
+export class MediaPlayer {
     constructor(config) {
         this._config = config.widgets.mediaPlayer || {};
         this._container = null;
@@ -281,7 +286,7 @@ var MediaPlayer = class MediaPlayer {
             text: '',
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this._titleLabel.clutter_text.ellipsize = imports.gi.Pango.EllipsizeMode.END;
+        this._titleLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         textBox.add_child(this._titleLabel);
         
         this._artistLabel = new St.Label({
@@ -289,7 +294,7 @@ var MediaPlayer = class MediaPlayer {
             text: '',
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this._artistLabel.clutter_text.ellipsize = imports.gi.Pango.EllipsizeMode.END;
+        this._artistLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
         textBox.add_child(this._artistLabel);
         
         this._container.add_child(textBox);
