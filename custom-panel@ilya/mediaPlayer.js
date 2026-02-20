@@ -239,6 +239,10 @@ export class MediaPlayer {
         });
         
         this._container.connect('button-press-event', (actor, event) => {
+            // Не активируем окно если клик был по кнопке play/pause
+            if (this._playPauseButton && this._playPauseButton.contains(event.get_source())) {
+                return Clutter.EVENT_PROPAGATE;
+            }
             if (event.get_button() === 1 && this._activePlayer) {
                 this._activePlayer.raise();
                 return Clutter.EVENT_STOP;
@@ -261,15 +265,18 @@ export class MediaPlayer {
             style_class: 'media-player-play-button',
             y_align: Clutter.ActorAlign.CENTER,
             can_focus: true,
+            reactive: true,
             child: new St.Icon({
                 icon_name: 'media-playback-start-symbolic',
                 style_class: 'media-player-play-icon',
             }),
         });
-        this._playPauseButton.connect('clicked', () => {
-            if (this._activePlayer) {
+        this._playPauseButton.connect('button-press-event', (actor, event) => {
+            if (event.get_button() === 1 && this._activePlayer) {
                 this._activePlayer.playPause();
+                return Clutter.EVENT_STOP;
             }
+            return Clutter.EVENT_PROPAGATE;
         });
         this._container.add_child(this._playPauseButton);
         
