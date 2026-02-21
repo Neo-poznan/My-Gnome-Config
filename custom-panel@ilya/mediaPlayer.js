@@ -1,5 +1,4 @@
 import Gio from 'gi://Gio';
-import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
@@ -214,9 +213,12 @@ export class MediaPlayer {
         this._artistLabel = null;
     }
     
-    get container() {
+    /**
+     * Геттер для данных виджета (используется WidgetsManager)
+     */
+    get widget() {
         return {
-            container: this._container
+            actor: this._container
         };
     }
     

@@ -17,13 +17,11 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
 export class SystemMonitor {
     constructor() {
-        this._panel = null;
         this._container = null;
         this._memoryLabel = null;
         this._cpuLabel = null;
         this._cpuTempLabel = null;
         this._gpuTempLabel = null;
-        this._settingsChangedId = null;
         this._updateTimeoutId = null;
         
         // Для расчёта загрузки CPU
@@ -32,22 +30,18 @@ export class SystemMonitor {
     }
     
     /**
-     * Геттер для контейнера
+     * Геттер для данных виджета (используется WidgetsManager)
      */
-    get container() {
-        const widgetData = {
-            container: this._container
-        }
-        return widgetData;
+    get widget() {
+        return {
+            actor: this._container
+        };
     }
     
     /**
-     * Создаёт виджет без добавления на панель
-     * (позиционирование управляется через WidgetPositioner)
-     * @param {Panel} panel - наша кастомная панель
+     * Создаёт виджет системного монитора
      */
-    createWidget(panel) {
-        this._panel = panel;
+    createWidget() {
         
         // Создаём контейнер
         this._container = new St.BoxLayout({
@@ -109,16 +103,6 @@ export class SystemMonitor {
     }
     
     /**
-     *
-     * Включает монитор и добавляет его на панель
-     * @param {Panel} panel - наша кастомная панель
-     */
-    enable(panel) {
-        this.createWidget(panel);
-        this._updatePosition();
-    }
-    
-    /**
      * Отключает и удаляет монитор
      */
     disable() {
@@ -141,7 +125,6 @@ export class SystemMonitor {
         this._cpuLabel = null;
         this._cpuTempLabel = null;
         this._gpuTempLabel = null;
-        this._panel = null;
     }
     
     /**
@@ -153,38 +136,6 @@ export class SystemMonitor {
             style_class: 'system-monitor-separator',
             y_align: Clutter.ActorAlign.CENTER
         });
-    }
-    
-    /**
-     * Обновляет позицию монитора на панели
-     */
-    _updatePosition() {
-        if (!this._container || !this._panel) return;
-        
-        // Удаляем из текущего родителя
-        const currentParent = this._container.get_parent();
-        if (currentParent) {
-            currentParent.remove_child(this._container);
-        }
-        
-        // Получаем позицию и добавляем
-        const position = 'left'; // Жёстко задано для упрощения
-        const box = this._getBoxForPosition(position);
-        box.add_child(this._container);
-    }
-    
-    /**
-     * Возвращает box для указанной позиции
-     */
-    _getBoxForPosition(position) {
-        switch (position) {
-            case 'center':
-                return this._panel.centerBox;
-            case 'left':
-                return this._panel.leftBox;
-            default:
-                return this._panel.rightBox;
-        }
     }
     
     /**

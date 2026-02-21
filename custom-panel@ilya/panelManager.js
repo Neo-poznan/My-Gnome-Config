@@ -1,5 +1,3 @@
-import GLib from 'gi://GLib';
-import Meta from 'gi://Meta';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import { Panel } from './panel.js';

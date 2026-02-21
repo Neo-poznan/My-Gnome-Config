@@ -1,8 +1,5 @@
-import GLib from 'gi://GLib';
-import Meta from 'gi://Meta';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import { SystemWidgets } from './systemWidgets.js';
 import { SystemMonitor } from './systemMonitor.js';
@@ -51,9 +48,9 @@ export class WidgetsManager {
         this._mediaPlayer.createWidget();
         
         this._widgets = this._systemWidgets.getWidgets();
-        this._widgets['taskbar'] = this._taskbar.container;
-        this._widgets['systemMonitor'] = this._systemMonitor.container;
-        this._widgets['mediaPlayer'] = this._mediaPlayer.container;
+        this._widgets['taskbar'] = this._taskbar.widget;
+        this._widgets['systemMonitor'] = this._systemMonitor.widget;
+        this._widgets['mediaPlayer'] = this._mediaPlayer.widget;
         this.addWidgets(panel, this._widgets);
     }
 
@@ -67,9 +64,9 @@ export class WidgetsManager {
             }
             if ( this._knownElements.includes(widgetName) ) {
                 const item = widgets[widgetName];
-                const parent = item.container.get_parent();
+                const parent = item.actor.get_parent();
                 if (parent) {
-                    parent.remove_child(item.container);
+                    parent.remove_child(item.actor);
                 }
                 const needTrackHover = this._isNeedTrackHover(widgetName);
                 const widgetContainer = new St.BoxLayout({
@@ -82,7 +79,7 @@ export class WidgetsManager {
                     track_hover: needTrackHover,
                 })
                 widgetContainer.set_size(this._elementsWidth[widgetName], this.elementsHeight[widgetName]);
-                widgetContainer.add_child(item.container);
+                widgetContainer.add_child(item.actor);
                 const box = this._getWidgetBox(widgetName, panel);
                 console.log('Adding widget ' + widgetName + ' to box ' + box.name);
                 box.add_child(widgetContainer);
@@ -90,9 +87,9 @@ export class WidgetsManager {
             else {
                 const item = widgets[widgetName];
                 console.log('Unknown widget: ' + widgetName);
-                const parent = item.container.get_parent();
+                const parent = item.actor.get_parent();
                 if (parent) {
-                    parent.remove_child(item.container);
+                    parent.remove_child(item.actor);
                 }
                 const widgetContainer = new St.BoxLayout({
                     name: `${widgetName}-container`,
@@ -104,7 +101,7 @@ export class WidgetsManager {
                     track_hover: true,
                 })
                 widgetContainer.set_size(-1, this.defaultElementsHeight);
-                widgetContainer.add_child(item.container);
+                widgetContainer.add_child(item.actor);
                 const box = this._getWidgetBox(widgetName, panel);
                 box.add_child(widgetContainer);
            

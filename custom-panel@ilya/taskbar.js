@@ -4,23 +4,18 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
-import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as AppMenu from 'resource:///org/gnome/shell/ui/appMenu.js';
 
 import { WindowPreviewPopup } from './windowPreview.js';
 
 export class Taskbar {
     constructor() {
-        this._panel = null;
-        this._settings = null;
         this._container = null;
-        this._showAppsButton = null;
         this._appSystemSignalId = null;
         this._favoritesSignalId = null;
-        this._settingsChangedId = null;
         this._windowCreatedId = null;
         this._windowClosedId = null;
-        this._iconSize = 30; // Стандартный размер иконок, можно сделать настраиваемым
+        this._iconSize = 30;
         this._windowPreview = null;
         this._contextMenu = null;
         this._globalClickId = null;
@@ -41,8 +36,6 @@ export class Taskbar {
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER
         });
-
-        console.log(this.container, 'container name');
         
         // Заполняем таскбар
         this._updateApps();
@@ -76,31 +69,12 @@ export class Taskbar {
     }
     
     /**
-     * @deprecated Используйте createWidgets() + WidgetPositioner
-     * Включает таскбар и добавляет его на указанную панель
-     * @param {Panel} panel - наша кастомная панель
+     * Геттер для данных виджета (используется WidgetsManager)
      */
-    enable(panel) {
-        this.createWidgets(panel);
-        // Старое позиционирование - не используется с WidgetPositioner
-        this._updatePositions();
-    }
-    
-    /**
-     * Геттер для кнопки показа приложений
-     */
-    get showAppsButton() {
-        return this._showAppsButton;
-    }
-    
-    /**
-     * Геттер для контейнера таскбара
-     */
-    get container() {
-        const widgetData = {
-            container: this._container,
+    get widget() {
+        return {
+            actor: this._container,
         };
-        return widgetData;
     }
     
     disable() {
@@ -143,57 +117,12 @@ export class Taskbar {
         
         this._removeGlobalClickHandler();
         
-        // Удаляем элементы из всех возможных контейнеров
-        if (this._showAppsButton) {
-            const parent = this._showAppsButton.get_parent();
-            if (parent) parent.remove_child(this._showAppsButton);
-            this._showAppsButton.destroy();
-            this._showAppsButton = null;
-        }
-        
+        // Удаляем контейнер таскбара
         if (this._container) {
             const parent = this._container.get_parent();
             if (parent) parent.remove_child(this._container);
             this._container.destroy();
             this._container = null;
-        }
-        
-        this._panel = null;
-    }
-    
-    /**
-     * Обновляет позиции элементов на панели
-     */
-    _updatePositions() {
-        if (!this._panel ) return;
-        
-        // Удаляем из текущих родителей
-        if (this._showAppsButton.get_parent()) {
-            this._showAppsButton.get_parent().remove_child(this._showAppsButton);
-        }
-        if (this._container.get_parent()) {
-            this._container.get_parent().remove_child(this._container);
-        }
-    }
-    
-    /**
-     * Обновляет размеры всех иконок
-     */
-    _updateIconSizes() {
-        // Обновляем иконку кнопки показа приложений
-        if (this._showAppsButton && this._showAppsButton._icon) {
-            this._showAppsButton._icon.set_icon_size(this._iconSize);
-            this._showAppsButton._icon.set_size(this._iconSize, this._iconSize);
-        }
-        
-        // Обновляем иконки приложений (новая структура с контейнером)
-        if (this._container) {
-            this._container.get_children().forEach((container) => {
-                if (container._icon) {
-                    container._icon.set_icon_size(this._iconSize);
-                    container._icon.set_size(this._iconSize, this._iconSize);
-                }
-            });
         }
     }
     

@@ -1,7 +1,3 @@
-import GLib from 'gi://GLib';
-import Meta from 'gi://Meta';
-import St from 'gi://St';
-import Clutter from 'gi://Clutter';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 export class SystemWidgets {
@@ -17,8 +13,8 @@ export class SystemWidgets {
         for (let widgetName in statusArea) {
             const item = statusArea[widgetName];
             const widgetData = {
-                container: item.container,
-                parent: item.container.get_parent()
+                actor: item.container,
+                originalParent: item.container.get_parent()
             };
             widgets[widgetName] = widgetData;
         };
@@ -31,17 +27,17 @@ export class SystemWidgets {
             const item = widgets[widgetName];
             this._originalWidgets.push({
                 name: widgetName,
-                container: item.container,
-                parent: item.parent
+                actor: item.actor,
+                originalParent: item.originalParent
             });
         }
     }
 
     restoreOriginalWidgets() {
         this._originalWidgets.forEach(element => {
-            const currentParent = element.container.get_parent();
-            currentParent.remove_child(element.container);
-            element.parent.add_child(element.container);
+            const currentParent = element.actor.get_parent();
+            currentParent.remove_child(element.actor);
+            element.originalParent.add_child(element.actor);
         });
     }
 
